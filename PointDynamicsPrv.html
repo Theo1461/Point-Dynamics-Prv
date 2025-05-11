@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+<title>Point Dynamics Preview</title>
+<style>
+body {
+  font-family: 'Ubuntu', sans-serif;
+  background-color: #FDFAF4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  font-weight: bold;
+}
+#game-card {
+  background-color: #F8F5EA;
+  padding: 20px;
+  color: #0c0c0c;
+  border-radius: 10px;
+  position: fixed;
+  width: 300px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+  z-index: 2;
+  box-shadow: 0px 10px 5px -5px rgba(0, 0, 0,0.45);
+}
+#sidebar {
+  border-radius: 10px;
+  text-align: center;
+  background-color: #F8F5EA;
+  position: absolute;
+  width: 175px;
+  height: 200px;
+  top: 25%vh;
+  right: 10vw;
+  z-index: 0;
+  box-shadow: 0px 10px 5px -5px rgba(0, 0, 0,0.45);
+}
+#loading {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: #FDFAF4;
+  z-index: 100;
+}
+.dice-button {
+  border-radius: 6px;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0px 9px 8px -5px rgba(0, 0, 0, 0.45);
+}
+.setting-button {
+  font-weight: bolder;
+  line-height: calc(1.2em + 1px);
+  color: #43525E;
+  border-radius: 6px;
+  position: fixed;
+  top: -30px;
+  left: -80%;
+  width: 75px;
+  height: 75px;
+  background-color: #697681;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0px 9px 10px -5px rgba(0, 0, 0, 0.45);
+  font-size: 30px;
+}
+#settings-card h5 {
+  font-size: 20px;
+}
+.multiplier-section p {
+  font-size: 14px;
+}
+#achievement-container {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 0px;
+}
+.button-container button {
+  padding: 8px 12px;
+  font-size: 12px;
+  background: #536777;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.button-container button:hover {
+  background: #2e3c48;
+}
+.info-text {
+  font-size: 10px;
+  color: #bbb;
+  margin-top: 10px;
+}
+.dice-button::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: black;
+  border-radius: 50%;
+  position: absolute;
+}
+.dice-button.fire::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: rgb(205, 40, 10);
+  border-radius: 50%;
+  position: absolute;
+}
+.dice-button.gold::before {
+  background-color: rgb(220, 143, 11);
+}
+.dice-button.seed::before {
+  background-color: rgb(110, 216, 40);
+}
+.dice-button.water::before {
+  background-color: rgb(45, 96, 237);
+}
+.dice-button.rust::before {
+  background-color: rgb(131, 99, 72);
+}
+#loading-line {
+  position: relative;
+  color: black;
+  text-align: center;
+  top: 50%;
+  left: -150%;
+  width: 150vw;
+  height: 50px;
+  background-color: #EFEAD4;
+  animation: moveline 10s linear forwards;
+  z-index: 103;
+  box-shadow: 0px 10px 5px -5px rgba(56, 55, 49, 1);
+}
+@keyframes moveline {
+  0% {
+    left: -50%vw;
+  }
+  100% {
+    left: 100%
+  }
+}
+#gameVer {
+  z-index: 101;
+  color: #ffffff;
+  position: relative;
+  top: 30%;
+  justify-content: center;
+  text-align: center;
+}
+#software {
+  z-index: 101;
+  color: #ffffff;
+  position: relative;
+  top: 10%;
+  justify-content: center;
+  text-align: center;
+}
+#settingsMenu {
+  color: white;
+  position: fixed;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #697681;
+  z-index: 5;
+  justify-content: center;
+  text-align: center;
+}
+.setting-button2 {
+  font-weight: bolder;
+  color: #536777;
+  border-radius: 6px;
+  width: 70px;
+  height: 70px;
+  background-color: #697681;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 7;
+}
+#lowerbar {
+  position: fixed;
+  z-index: 1;
+  border-radius: 10px;
+  bottom: -10%;
+  height: 200px;
+  width: 100%;
+  background-color: #D44E10;
+  box-shadow: 5px 5px 5px 7px rgb(58, 28, 8);
+}
+#area {
+  position: fixed;
+  z-index: 5;
+  top: 1%
+}
+button {
+  border-radius: 10px;
+  border: none;
+  width: auto;
+  height: 70px;
+  background-color: #43525E;
+  color: #0c0c0c;
+  font-family: Ubuntu;
+  font-weight: bolder;
+  cursor: pointer;
+  box-shadow: 0px 8px 5px -1px rgb(28, 28, 28);
+}
+#container {
+  background-color: #5c5045;
+  border-radius: 10px;
+  position: absolute;
+  width: 300px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  z-index: 999;
+  box-shadow: 0px 10px 15px -5px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  overflow: hidden;
+  border: none;
+}
+#container-header {
+  background-color: #eb8334;
+  color: #ffffff;
+  padding: 6px;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.close-btn {
+  background-color: #fc291e;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.close-btn:hover {
+  background-color: #ea2323;
+}
+#commandInput {
+  background-color: #3c3730;
+  border: none;
+  outline: none;
+  color: #f4f4f4;
+  font-size: 14px;
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#suggestions {
+  background-color: #3c3730;
+  color: #f4f4f4;
+  font-size: 12px;
+  max-height: 60px;
+  overflow-y: auto;
+  padding: 5px;
+  border-top: none;
+}
+#output {
+  background-color: #5c5045;
+  color: #bfbfbf;
+  font-size: 12px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 5px;
+  font-family: 'Ubuntu';
+}
+#suggestions div {
+  padding: 3px 5px;
+  cursor: pointer;
+}
+
+#suggestions div:hover {
+  background-color: #3c3730;
+}
+#mod-container {
+  background-color: #dbdbdb;
+  border-radius: 10px;
+  position: absolute;
+  width: 300px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  z-index: 999;
+  box-shadow: 0px 10px 15px -5px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  overflow: hidden;
+  border: none;
+}
+#mod-header {
+  background-color: #45dd34;
+  color: #ffffff;
+  padding: 6px;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#modFile {
+  background-color: #a7a7a7;
+  height: 27.5px;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+  position: absolute;
+  top: 27.25px;
+  width: 100%;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bolder;
+}
+input[type="file"] {
+  border: 1px solid #000;
+  padding: 5px;
+  color: #3c3730;
+  font-weight: bolder;
+  background-color: #979797;
+  font-family: 'Ubuntu', sans-serif;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+input[type="file"]::file-selector-button {
+  background-color: #939393;
+  color: white;
+  border: none;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+input[type="file"]::file-selector-button:hover {
+  background-color: #898989;
+}
+input[type="file"]:focus {
+  outline: 2px solid #5f5f5f;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+#achievement-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100px;
+  gap: 15px;
+  color: white;
+}
+.achievement-box {
+  width: 20px;
+  height: 20px;
+  margin-top: 5px;
+  box-shadow: 0px 8px 5px -1px rgba(56, 55, 49, 1);
+  background-color: #c4c4c4;
+  transition: background-color 0.3s;
+}
+.achievement-box.unlocked {
+  background-color: #34eb3d;
+  box-shadow: 0 0 10px #34eb3d;
+}
+.achievement-text {
+  font-size: 12px;
+  width: 275px;
+  color: #ffffff;
+  font-family: 'Ubuntu', sans-serif;
+  left: 20px;
+}
+#background2106 {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: #EDC9Af;
+  overflow: hidden;
+  }
+
+.pyramid {
+  width: 200px;
+  height: 150px;
+  position: absolute;
+  }
+
+.pyramid.one {
+  left: 20%;
+  border-bottom: 150px solid #c89c78;
+  clip-path: polygon(97% 0%, 3% 0%, 100% 100%, 0% 100%);
+  transform: scale(4);
+  bottom: 18%;
+  }
+
+.pyramid.two {
+  left: 57%;
+  bottom: 30%;
+  clip-path: polygon(99% 0%, 1% 0%, 100% 100%, 0% 100%);
+  transform: scale(5);
+  border-bottom: 150px solid #b88d69;
+  }
+.desert-static-wave {
+  position: fixed;
+  width: 350%;
+  text-align: center;
+  font-size: 97.5px;
+  color: #f1caaf;
+  font-family: monospace;
+  font-weight: bolder;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateX(0);
+  text-shadow: 2px 2px 4px rgba(232, 193, 164, 0.2)
+}
+.rust-circle {
+  width: 10px;
+  height: 10px;
+  background-color: #8B4513;
+  border-radius: 50%;
+}
+#soft-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 130vw;
+  height: 110vh;
+  background-image: url('paper.webp');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 9137438328
+}
+.desert-dune {
+  position: absolute;
+  background: linear-gradient(to top, #f6d6bd, #e6c28b);
+  border-radius: 50%;
+  transform: scaleX(1.3);
+  pointer-events: none;
+  box-shadow: inset -10px 10px 40px rgba(0,0,0,0.1);
+  z-index: 2;
+}
+
+.desert-floor {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 10vh;
+  background: linear-gradient(to top, #f1caaf, #f4d8a6);
+  z-index: 1;
+}
+
+</style>
+<script src="software.js"></script>
+</head>
+<link rel="manifest" href="manifest.json">
+<body>
+<div style="display: none" id="soft-overlay"></div>
+  <div id="rust-indicator" style="position: fixed; top: 10vh; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 100;"></div>
+  <canvas id="rainCanvas"></canvas>
+  <div id="mod-container" style="display: none;">
+    <div id="mod-header">
+      <div onclick="comms = false; document.querySelector('#container').style.display = 'none'; document.querySelector('#mod-container').style.display = 'none'"class="close-btn"></div>
+      <span class="title">Add-On Loader</span>
+    </div>
+    <input type="file" id="modFile" style="font-weight: bolder; background-color: #c1c1c1; font-family: 'Ubuntu', sans-serif;"onchange="loadModFile()">
+  </div>
+  <div id="container" style="display: none;">
+      <div id="container-header">
+        <div onclick="comms = false; document.querySelector('#container').style.display = 'none'; document.querySelector('#mod-container').style.display = 'none'"class="close-btn"></div>
+        <span class="title">Terminal</span>
+      </div>
+      <input 
+        id="commandInput" 
+        oninput="showSuggestions()" 
+        onkeydown="if(event.key === 'Enter') executeCommand()" 
+        placeholder="..." />
+      <div id="suggestions"></div>
+      <div id="output"></div>
+    </div>
+  
+<div id="area"></div>
+<div id="settingsMenu" style="display: none;" class="settings-container">
+  <div id="settings-card">
+    <h5>Settings</h5>
+    <div id="tubes"></div>
+    <div style="color: white"class="multiplier-section">
+      <p>Current Multiplier: <span id="currentMultiplier">1</span>x</p>
+      <button style="color: white;"id="upgradeButton">+1x Multiplier</button>
+    </div>
+    <div style="position: fixed; top: 40px; left: 10px;";id="achievement-container">
+      <h5>Achievements</h5>
+      <div class="achievement-box" id="ach1000-box"><p style="position: relative;left: 30px; width: 250px;">  1000 Tokens Collected</p></div>
+      <div class="achievement-box" id="ach10000-box"><p style="position: relative;left: 30px; width: 250px;">10000 Tokens Collected</p></div>
+      <div class="achievement-box" id="ach20000-box"><p style="position: relative;left: 30px; width: 250px;">20000 Tokens Collected</p></div>
+      <div class="achievement-box" id="ach50000-box" style="display: none;"><p style="display: none; position: relative;left: 30px; width: 250px;">50000 Tokens Collected</p></div>
+    </div>
+
+    <div style="position: fixed; top: 250px; left: 25%;"class="button-container">
+      <button onclick="executeOn()">Coding Tools<p class="info-text">Developer Mode <br>(NO Achievements)</p></button>
+      <button onclick="tubetrade()">Get Tubes <p class="info-text">10 Tokens = 1 Tube</p></button>
+      <button onclick="tubes1()">Desert Planet<p class="info-text">Unlock Windswept Desert</p></button>
+      <button onclick="startAutoClicker()">Auto Rolling <p class="info-text">Enable Auto Roll (10s)</p></button>
+      <button onclick="settings()" class="setting-button2">O<p class="info-text">Exit Settings</p></button>
+    </div>
+  </div>
+</div>
+<div id="loading" style="display: none">
+    <div id="background2106">
+  <div class="pyramid one"></div>
+  <div class="pyramid two"></div>
+</div>
+  <div id="gameVer"></div>
+  <div id="software"></div>
+  <div id="loading-line"></div>
+</div>
+<div id="game-card">
+<p>v.2.10.6.11 Prv</p>
+<button class="dice-button"onclick="rollDice()"></button>
+<button class="setting-button" onclick="settings()">⬣</button>
+</div>
+<div id="sidebar">
+<p>Sidebar</p>
+<div id="saved-points"></div>
+<div id="side-points"></div>
+<div id="rolled-points"></div>
+<div id="seeds"></div>
+</div>
+<script>
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+  let gameVer = 2.10611
+  let terminalOffsetX = 0
+  let terminalOffsetY = 0
+  let terminalDragging = false
+  let modOffsetX = 0
+  let modOffsetY = 0
+  let modDragging = false
+savedPoints = parseInt(localStorage.getItem('savedPoints')) || 0;
+seeds = parseInt(localStorage.getItem('seeds')) || 0;
+sidePoints = parseInt(localStorage.getItem('sidePoints')) || 0;
+tube = parseInt(localStorage.getItem('tube')) || 0;
+function updateRustCircles(rustRounds) {
+  const container = document.getElementById('rust-indicator');
+  container.innerHTML = '';
+  if (rustRounds <= 0) return;
+  for (let i = 0; i < rustRounds; i++) {
+    const circle = document.createElement('div');
+    circle.className = 'rust-circle';
+    container.appendChild(circle);
+  }
+}
+
+if (softwareVersion >= "211") {
+  console.log(`Running Software C ${softwareVersion}`)
+} else {
+  alert(`Unsupported Counter Version : Version needed C 211 or Higher`)
+}
+if (softwareVersion >= "211") {
+  function updateDisplay() {
+  currentMultiplier.textContent = multiplier
+}
+const terminalContainer = document.getElementById('container')
+const terminalHeader = document.getElementById('container-header')
+terminalContainer.style.position = 'absolute'
+terminalHeader.addEventListener('mousedown', (e) => {
+  terminalDragging = true
+  terminalOffsetX = e.clientX - terminalContainer.getBoundingClientRect().left
+  terminalOffsetY = e.clientY - terminalContainer.getBoundingClientRect().top
+  terminalContainer.style.zIndex = 1000
+})
+document.addEventListener('mousemove', (e) => {
+  if (terminalDragging) {
+  terminalContainer.style.left = (e.clientX - terminalOffsetX) + 'px'
+  terminalContainer.style.top = (e.clientY - terminalOffsetY) + 'px'
+  }
+})
+document.addEventListener('mouseup', () => {
+  terminalDragging = false
+})
+const modContainer = document.getElementById('mod-container')
+const modHeader = document.getElementById('mod-header')
+modHeader.onmousedown = function(e) {
+  modDragging = true;
+  modOffsetX = e.clientX - modContainer.getBoundingClientRect().left
+  modOffsetY = e.clientY - modContainer.getBoundingClientRect().top
+}
+
+document.onmousemove = function(e) {
+  if (modDragging) {
+  modContainer.style.left = e.clientX - modOffsetX + 'px'
+  modContainer.style.top = e.clientY - modOffsetY + 'px'
+  }
+}
+document.onmouseup = function() {
+  modDragging = false
+}
+window.addEventListener('keydown', function(event) {
+ if ((event.ctrlKey && (event.key === '+' || event.key === '-' || event.key === '='))) {
+  event.preventDefault()
+  }})
+window.addEventListener('wheel', function(event) {
+  if(event.ctrlKey) {
+  event.preventDefault()
+}})
+if (loadingtextblk) {
+document.getElementById('gameVer').style.color = '#000000';
+document.getElementById('software').style.color = '#000000';
+}
+function startAutoClicker() {
+if (savedPoints >= 75) {
+if (!autoclicker) {
+  savedPoints = savedPoints - 75
+  updatePowerUp()
+  autoclicker = true
+  autoClickerInterval = setInterval(rollDice, 100)
+  autoClickerTimeout = setTimeout(stopAutoClicker, 10000)
+  settings()
+}} else {
+  alert("75 Tokens Needed")
+}}
+function stopAutoClicker() {
+  console.log("Autoclicker off.")
+  autoclicker = false;
+  clearInterval(autoClickerInterval)
+  clearTimeout(autoClickerTimeout)
+}
+function rainOff() {
+  heavyRain = false
+  stopRain()
+  
+}
+function executeOn() {
+  devTools = !devTools
+  comms = !comms
+  cheats = true
+  if (comms) {
+  document.querySelector('#container').style.display = 'block'
+  document.querySelector('#mod-container').style.display = 'block'
+} else {
+  document.querySelector('#container').style.display = 'none'
+  document.querySelector('#mod-container').style.display = 'none'
+  suggestionsDiv.innerHTML = ''
+  if (commandInput) {
+  const filteredCommands = commandList.filter(command => command.toLowerCase().includes(commandInput))
+  filteredCommands.forEach(command => {
+  const suggestionItem = document.createElement("div")
+  suggestionItem.textContent = command;
+  suggestionItem.onclick = function() {
+  document.getElementById("commandInput").value = command
+  suggestionsDiv.innerHTML = ''
+}
+  suggestionsDiv.appendChild(suggestionItem)
+})
+}
+  suggestionItem.remove()
+}}
+const commandList = [
+  'fct rollDice',
+  'fct powerUp',
+  'fct loading',
+  'fct triggerLightning',
+  'fct rainOff',
+  'fct autoClicker',
+  'dta reset 0',
+  'dta savedPoints 32Bit',
+  'adn <addonCode>'
+];
+
+const upgradeButton = document.getElementById('upgradeButton')
+const currentMultiplier = document.getElementById('currentMultiplier')
+const nextCostDisplay = document.getElementById('nextCost')
+
+function showNotEnoughTokensPopup() {
+  alert(`${nextCost} Tokens Needed`)
+}
+upgradeButton.addEventListener('click', () => {
+  if (savedPoints >= nextCost && multiplier <= 64) {
+  savedPoints -= nextCost
+  multiplier = multiplier + 1
+  nextCost = nextCost + (nextCost / 2)
+  updateDisplay()
+  alert(`New Multiplier: x${multiplier}`);
+} else if (savedPoints <= nextCost){
+  showNotEnoughTokensPopup()
+} else if (multiplier > 64) {
+  multiplier = 67
+}
+})
+function showSuggestions() {
+  const commandInput = document.getElementById("commandInput").value.trim().toLowerCase()
+  const suggestionsDiv = document.getElementById("suggestions")
+  suggestionsDiv.innerHTML = ''
+if (!commandInput) return
+  const filteredCommands = commandList.filter(command => command.toLowerCase().includes(commandInput))
+if (filteredCommands.length > 0) {
+  const suggestionItem = document.createElement("div")
+  suggestionItem.textContent = filteredCommands[0]
+  suggestionItem.onclick = function() {
+  document.getElementById("commandInput").value = filteredCommands[0]
+  suggestionsDiv.innerHTML = ''
+}
+suggestionsDiv.appendChild(suggestionItem);
+}
+}
+function executeCommand() {
+if (comms) {
+  const commandInput = document.getElementById("commandInput").value.trim()
+  const outputDiv = document.getElementById("output")
+if (commandInput === 'fct rollDice') {
+  rollDice()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'fct powerUp') {
+  powerUp()
+  updatePowerUp()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'fct loading') {
+  loading()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'fct triggerLightning') {
+  triggerLightning()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'fct rainOff') {
+  rainOff()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'fct autoClicker') {
+  savedPoints = savedPoints + 75
+  startAutoClicker()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'dta reset 0') {
+  resetAllPointsAndSeeds()
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput === 'dta savedPoints 32Bit') {
+  savedPoints = 2147483699
+  outputDiv.innerHTML = `Executed: ${commandInput}<br>Results: ${results}`
+} else if (commandInput.startsWith('adn ')) {
+  const modCode = commandInput.replace('adn ', '').trim()
+try {
+  eval(modCode);
+  outputDiv.innerHTML = `Changes Loaded Successfully!<br>Executed: ${commandInput}`
+} catch (err) {
+  outputDiv.innerHTML = `Failed to load changes: ${err}`
+}} else {
+  outputDiv.innerHTML = `Invalid command. Please use the formatting: '/type/ /name/ /data if needed/'.`
+}
+  document.getElementById("commandInput").value = ''
+}}
+
+function loading() {
+  if (savedPoints < 2147483647) {
+  const loadingLine = document.getElementById('loading-line')
+  document.getElementById('loading').style.display = "block"
+  document.getElementById('background2106').style.display = "block"
+  updatePowerUp()
+  loadingLine.style.animation = "moveline 5s linear forwards"
+  setTimeout(function() {
+  document.getElementById('loading').style.display = "none"
+  document.getElementById('background2106').style.display = "none"
+  updatePowerUp()
+  if (softwareVersion >= "211") {
+  console.log(`Running Software C ${softwareVersion}`)
+}
+}, 2525)}}
+function loading3() {
+  {
+  const loadingLine = document.getElementById('loading-line')
+  const softOverlay = document.getElementById('soft-overlay');
+  document.getElementById('loading').style.display = "block"
+  document.getElementById('background2106').style.display = "block"
+  updatePowerUp()
+  loadingLine.style.animation = "moveline 10s linear forwards"
+  loadingLine.style.color = "#433E35"
+  loadingLine.innerText = "Loading: Buttons, Assets, Points & Dynamics.";
+
+  setTimeout(function() {
+  document.getElementById('loading').style.display = "none"
+  loadingLine.innerText = ''
+  softOverlay.style.display = 'block';
+  document.getElementById('background2106').style.display = "none"
+  updatePowerUp()
+  if (softwareVersion >= "211") {
+  console.log(`Running Software C ${softwareVersion}`)
+}
+}, 5000)}}
+function loading2() {
+  if (savedPoints < 2147483647) {
+  const loadingLine = document.getElementById('loading-line')
+  document.getElementById('loading').style.display = "block"
+  document.getElementById('background2106').style.display = "block"
+  updatePowerUp()
+  loadingLine.style.animation = "moveline 1s linear forwards"
+  setTimeout(function() {
+  document.getElementById('loading').style.display = "none"
+  document.getElementById('background2106').style.display = "none"
+  updatePowerUp()
+  if (softwareVersion >= "211") {
+  console.log(`Running Software C ${softwareVersion}`)
+}
+}, 505)}}
+function tubetrade() {
+  if (savedPoints >= 10) {
+  savedPoints = savedPoints - 10
+  
+  tube = tube + 1
+
+  updatePowerUp()
+} else {
+  alert('10 Tokens Needed')
+}
+}
+
+const rainCanvas = document.getElementById('rainCanvas')
+const rainCtx = rainCanvas.getContext('2d')
+rainCanvas.width = window.innerWidth
+rainCanvas.height = window.innerHeight
+class Raindrop{constructor(){this.x = Math.random() * rainCanvas.width
+  this.y = Math.random()*rainCanvas.height
+  this.length = Math.random() * 20 + 10
+  this.speed = 5
+  this.opacity = Math.random() * 0.3 + 0.2
+  this.splashY = rainCanvas.height-Math.random() * 10
+} 
+  draw() {
+  rainCtx.strokeStyle = `rgba(25,181,255,${this.opacity})`
+  rainCtx.lineWidth = 5.5
+  rainCtx.beginPath()
+  rainCtx.moveTo(this.x,this.y)
+  rainCtx.lineTo(this.x,this.y + this.length)
+  rainCtx.stroke()
+} 
+  splash() {
+  rainCtx.fillStyle=`rgba(25,181,255,0.3)`
+  rainCtx.beginPath()
+  rainCtx.arc(this.x,this.splashY, 2.5, 0,Math.PI * 2)
+  rainCtx.fill()
+  }
+  update() {
+  this.y += this.speed
+if(this.y > rainCanvas.height){this.y =- this.length
+  this.x=Math.random() * rainCanvas.width
+  this.splash()
+}}}
+
+let raindrops = []
+let numRaindrops = 0
+let heavyRain = true
+let fadeDuration = 2000
+let rainSound = new Audio('rain-sound-307165.mp3')
+function stopRain(){
+  rainCanvas.style.display='none';
+  rainSound.volume = 0;
+  thunder.volume = 0;
+}
+function startRain() {
+  raindrops = []
+if(heavyRain){
+  numRaindrops = 100
+} else {
+  numRaindrops = 0
+}
+for(let i = 0; i < numRaindrops; i++){
+  raindrops.push(new Raindrop()
+)}
+  rainCanvas.style.display='block'
+  animateRain()
+  triggerLightning()
+setTimeout(() => {
+  rainSound.loop = true
+  rainSound.volume = 0
+  rainSound.play().catch(()=>{console.warn("Audio failed to play due to restrictions.")})
+setTimeout(() => {let fadeInterval=setInterval(() => {
+if(rainSound.volume < 0.2)
+{
+  rainSound.volume += 0.01
+} else {clearInterval(fadeInterval)
+}
+  }, fadeDuration / 50)
+rainSound.addEventListener('timeupdate',() => {if(rainSound.currentTime >= 3.5){
+  rainSound.currentTime=0.44
+setTimeout(() => {rainSound.volume = 0.15},10)
+setTimeout(() => {rainSound.volume = 0.1},20)
+}})}, 0)}, 5000)}
+function animateRain(){
+  if (heavyRain) {
+  rainCtx.clearRect(0,0,rainCanvas.width,rainCanvas.height)
+  for(let drop of raindrops){
+  drop.update()
+  drop.draw()
+}}
+requestAnimationFrame(animateRain)}
+function triggerLightning(){
+const thunderSounds=['thunder-clap-242335.mp3','thunder-33569.mp3','big-thunder-clap-99753.mp3']
+const randomThunder = thunderSounds[Math.floor(Math.random() * thunderSounds.length)];
+const thunder = new Audio(randomThunder);
+thunder.volume = 1.0;
+forceThunderSound()
+
+const delay=Math.random() * 7000 + 3000
+setTimeout(() => {document.body.style.transition = 'background-color 0.2s'
+  document.body.style.backgroundColor = 'rgba(40,40,50,0.412)'
+setTimeout(() => {document.body.style.backgroundColor = 'rgba(30,30,40,1)'},360)
+  forceThunderSound()
+  triggerLightning()
+}, delay)}}
+function forceThunderSound(){
+  const thunderSounds=['thunder-clap-242335.mp3','thunder-33569.mp3','big-thunder-clap-99753.mp3']
+  const randomThunder = thunderSounds[Math.floor(Math.random() * thunderSounds.length)];
+  const thunder = new Audio(randomThunder);
+  thunder.volume = 1.0;
+  thunder.play().catch(() => {
+  console.warn("Audio failed to play due to restrictions.");
+  });
+  thunder.play()
+  thunder.volume = 0.5;
+  const button = document.createElement('button');
+  button.style.display = 'none';
+  document.body.appendChild(button);
+  button.addEventListener('click', () => {
+    thunder.play();
+    document.body.removeChild(button);
+  });
+
+  setTimeout(() => {
+    button.click();
+  }, 100);
+}
+loading3()
+function default1() {
+  background = 10
+}
+
+function rollDice() {
+  if (Math.random() < 0.05 && background === 10) {
+  let overlay = document.getElementById('dust-storm-overlay');
+  overlay = document.createElement('div');
+  overlay.id = 'dust-storm-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.backgroundColor = 'rgba(244, 216, 166, 0.5)'
+  overlay.style.zIndex = '9999';
+  overlay.style.pointerEvents = 'none';
+  overlay.style.display = 'block'
+  document.body.appendChild(overlay);
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+  button.disabled = true;
+  button.style.opacity = 0.25;
+  button.style.cursor = 'none';
+  });
+  setTimeout(() => {
+  overlay.style.display = 'none';
+  buttons.forEach(button => {
+  button.disabled = false;
+  button.style.cursor = '';
+  button.style.opacity = 1;
+
+  const upgradeButton = document.getElementById('upgradeButton');
+  upgradeButton.style.color = 'white';
+    });
+  }, 5000);
+}
+
+  if(rustRounds > 0) {
+    rustRounds = rustRounds - 1;
+    updateRustCircles(rustRounds);
+    rust = Math.floor(Math.random() * sidePoints) + 1;
+    sidePoints = sidePoints - rust
+    rustyPoints = rustyPoints + rust
+    console.log("Rusty Points:", rustyPoints);
+    console.log("Rust Rounds:", rustRounds);
+  } else if (rustRounds === 0) {
+    rustyPoints = Math.ceil(rustyPoints)
+    savedPoints = savedPoints - rustyPoints
+    rustyPoints = 0
+  }
+  updateDisplay()
+  
+  var diceButton = document.querySelector('.dice-button')
+  diceButton.classList.remove('fire')
+  diceButton.classList.remove('gold')
+  diceButton.classList.remove('seed')
+  diceButton.classList.remove('water')
+  rollCount = rollCount + 1
+  obsidianRolled = false
+  earthRolled = false
+  fireUp = false
+  waterUp = false
+  breezeUp = false
+  seedUp = false
+  goldUp = false
+  rustUp = false
+  sidePoints = sidePoints + rolledPoints
+  rolledPoints = 0
+if (savedPoints >= 1000 && !ach1000 && !cheats) {
+  ach1000 = true;
+  alert(`1000 Tokens! Achievement Unlocked!`);
+  document.getElementById('ach1000-box').classList.add('unlocked');
+  localStorage.setItem('ach1000', 'true');
+}
+
+if (savedPoints >= 10000 && !ach10000 && !cheats) {
+  ach10000 = true;
+  alert(`10000 Tokens! Achievement Unlocked!`);
+  document.getElementById('ach10000-box').classList.add('unlocked');
+  localStorage.setItem('ach10000', 'true');
+}
+
+if (savedPoints >= 20000 && !ach20000 && !cheats) {
+  ach20000 = true;
+  alert(`20000 Tokens! Achievement Unlocked!`);
+  document.getElementById('ach20000-box').classList.add('unlocked');
+  localStorage.setItem('ach20000', 'true');
+}
+
+if (savedPoints >= 50000 && !ach50000 && !cheats) {
+  ach50000 = true;
+  alert(`50000 Tokens! Achievement Unlocked!`);
+  document.getElementById('ach50000-box').classList.add('unlocked');
+  localStorage.setItem('ach50000', 'true');
+}
+
+
+if (localStorage.getItem('ach1000') === 'true' && !cheats) {
+  ach1000 = true;
+  document.getElementById('ach1000-box').classList.add('unlocked');
+}
+
+if (localStorage.getItem('ach10000') === 'true' && !cheats) {
+  ach10000 = true;
+  document.getElementById('ach10000-box').classList.add('unlocked');
+}
+
+if (localStorage.getItem('ach20000') === 'true' && !cheats) {
+  ach20000 = true;
+  document.getElementById('ach20000-box').classList.add('unlocked');
+}
+
+if (localStorage.getItem('ach50000') === 'true' && !cheats) {
+  ach50000 = true;
+  document.getElementById('ach50000-box').classList.add('unlocked');
+}
+  rolledPoints = Math.floor(Math.random() * 5 * multiplier) + 1;
+  console.log(`Rolled Points: ${rolledPoints} Side Points: ${sidePoints}`)
+  if (Math.random() < 0.875) {
+    powerUp()
+  }
+
+  console.log(`Rounds: ${rollCount}`)
+
+  if (rollCount % 10 === 0) {
+  savedPoints = savedPoints + sidePoints
+  sidePoints = 0
+  }
+}
+
+function tubes1() {
+  if (tube >= 75) {
+  tube = tube - 75
+  unlocked1 = true
+  updatePowerUp()
+  background = 10
+  loading()
+} else {
+  alert('75 Tubes Needed')
+}}
+
+function bg() {
+const gameCard = document.getElementById('game-card')
+const sidebar = document.getElementById('sidebar')
+if (background === 0) {
+if (!autoclicker) {
+  loading()
+} else {
+  loading2()
+}
+  gameCard.style.backgroundColor = '#E87D1E'
+  sidebar.style.backgroundColor = '#E87D1E'
+  document.body.style.backgroundColor = '#EBF8F9'
+  document.getElementById('area').innerText = `Mesa`
+}
+if (background === 1 && bgRounds <= 0) {
+if (!autoclicker) {
+  loading()
+} else {
+  loading2()
+}
+  bgRounds = 25
+  gameCard.style.backgroundColor = '#F8F5EA'
+  sidebar.style.backgroundColor = '#F8F5EA'
+  document.body.style.backgroundColor = '#FDFAF4'
+  background = 0
+  document.getElementById('area').innerText = `Flat`
+}}
+
+function powerUp() {
+  if (Math.random() < 0.45){
+    obsidianRolled = true
+  } else {
+    earthRolled = true
+  }
+
+  if (background === 10) {
+  if (!instant10) {
+    loading3()
+    instant10 = true
+  }
+
+  const gameCard = document.getElementById('game-card');
+  const sidebar = document.getElementById('sidebar');
+  background = 10;
+
+  gameCard.style.backgroundColor = '#F4D8A6';
+  sidebar.style.backgroundColor = '#F4D8A6';
+  document.body.style.backgroundColor = '#86C6F4'; // Sky blue
+  document.getElementById('area').innerText = `Windswept Desert`;
+  document.getElementById('area').style.color = `white`;
+
+  if (gameCard) gameCard.style.color = 'white';
+  if (sidebar) sidebar.style.color = 'white';
+  document.querySelectorAll('.desert-dune, .desert-floor').forEach(el => el.remove());
+  const dune1 = document.createElement('div');
+  dune1.className = 'desert-dune';
+  dune1.style.left = '-5vw';
+  dune1.style.bottom = '-12vh';
+  dune1.style.width = '40vw';
+  dune1.style.height = '45vh';
+  dune1.style.borderRadius = '50% 50% 0 0';
+
+  document.body.appendChild(dune1);
+  const dune3 = document.createElement('div');
+  dune3.className = 'desert-dune';
+  dune3.style.left = '70vw';
+  dune3.style.bottom = '-14vh';
+  dune3.style.width = '35vw';
+  dune3.style.height = '40vh';
+  dune3.style.borderRadius = '50% 50% 0 0';
+  document.body.appendChild(dune3);
+
+  const dune2 = document.createElement('div');
+  dune2.className = 'desert-dune';
+  dune2.style.left = '25vw';
+  dune2.style.bottom = '-23vh';
+  dune2.style.width = '50vw';
+  dune2.style.height = '40vh';
+  dune2.style.borderRadius = '60% 60% 0 0';
+  document.body.appendChild(dune2);
+
+  const floor = document.createElement('div');
+  floor.className = 'desert-floor';
+  document.body.appendChild(floor);
+}
+if (obsidianRolled) {
+  const rand = Math.random();
+  if (rand < 0.50 && background === 0) {
+    waterUp = true;
+  } else if (rand < 0.75) {
+    if (rand < 0.65) {
+    fireUp = true;
+    } else if (rustRounds === 0) {
+    rustUp = true;
+}}}
+
+if (earthRolled) {
+  if (Math.random() < 0.8) {
+    if (background === 10) {
+    goldUp = true;
+    console.log('Aurium (Golden)');
+    sidePoints += 50;
+}} else {
+    if (background === 0) {
+    seedUp = true;
+}}}
+  console.log(`Obsidian: ${obsidianRolled} Fire: ${fireUp} Water: ${waterUp}`)
+  console.log(`Earth: ${earthRolled} Breeze: ${breezeUp} Aurium: ${goldUp}`)
+  enforce32bitLimit()
+}
+
+function updatePowerUp() {
+  var diceButton = document.querySelector('.dice-button')
+  if (goldUp) {
+    diceButton.classList.remove('fire')
+    diceButton.classList.add('gold')
+    diceButton.classList.remove('seed')
+    diceButton.classList.remove('water')
+    diceButton.classList.remove('rust')
+  }
+  if (seedUp) {
+    seeds = seeds + rolledPoints
+    rolledPoints = 0
+    diceButton.classList.remove('fire')
+    diceButton.classList.remove('gold')
+    diceButton.classList.add('seed')
+    diceButton.classList.remove('water')
+    diceButton.classList.remove('rust')
+  }
+  if (fireUp) {
+    sidePoints = 0
+    diceButton.classList.add('fire')
+    diceButton.classList.remove('gold')
+    diceButton.classList.remove('seed')
+    diceButton.classList.remove('water')
+    diceButton.classList.remove('rust')
+  }
+  if (waterUp) {
+    savedPoints = savedPoints + seeds
+    seeds = 0
+    diceButton.classList.remove('fire')
+    diceButton.classList.remove('gold')
+    diceButton.classList.remove('seed')
+    diceButton.classList.add('water')
+    diceButton.classList.remove('rust')
+  }
+    if (rustUp) {
+    rustRounds = 5
+    diceButton.classList.remove('fire')
+    diceButton.classList.remove('gold')
+    diceButton.classList.remove('seed')
+    diceButton.classList.remove('water')
+    diceButton.classList.add('rust')
+  }
+  document.getElementById('saved-points').innerText = `Token Points: ${savedPoints}`;
+  document.getElementById('rolled-points').innerText = `Roll Points: ${rolledPoints}`;
+  document.getElementById('side-points').innerText = `Side Points: ${sidePoints}`;
+  document.getElementById('tubes').innerText = `Tubes: ${tube}`;
+  document.getElementById('gameVer').innerText = `Point Dynamics ${gameVer.toFixed(5)}`;
+  document.getElementById('software').innerText = `Operating On C ${softwareVersion}`;
+  document.getElementById('seeds').innerText = `Wheat Seeds: ${seeds}`;
+  localStorage.setItem('savedPoints', savedPoints.toString());
+  localStorage.setItem('seeds', seeds.toString());
+  localStorage.setItem('sidePoints', sidePoints.toString());
+  localStorage.setItem('tube', tube.toString());
+}
+function settings() {
+  settingsOpen = !settingsOpen
+  if (!autoclicker) {
+    loading()
+    } else {
+    loading2()
+    }
+  if (settingsOpen) {
+    document.getElementById('settingsMenu').style.display = 'block'
+  } else if (!settingsOpen) {
+    document.getElementById('settingsMenu').style.display = 'none'
+  }
+}
+
+function loadModFile() {
+  const file = document.getElementById('modFile').files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      eval(e.target.result);
+      alert('Addon File Loaded Successfully!');
+      if (!autoclicker) {
+      loading()
+      } else {
+      loading2()
+    }
+    } catch (err) {
+      alert('Failed to load addon: ' + err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAllPointsAndSeeds() {
+  savedPoints = 0;
+  rolledPoints = 0;
+  sidePoints = 0;
+  rollCount = 0;
+  seeds = 0;
+  seedUp = false;
+  fireUp = false;
+  waterUp = false;
+  breezeUp = false;
+  obsidianRolled = false;
+  earthRolled = false;
+  settingsOpen = false;
+  background = 0;
+  ach1000 = false;
+  multiplier = 1;
+  bgRounds = 0;
+  cactusUp = false;
+  goldUp = false;
+  tube = 0;
+  unlocked1 = false;
+  devTools = false;
+  heavyRain = true;
+  mudUp = false;
+  instant10 = false;
+  ach10000 = false;
+  ach20000 = false;
+  ach50000 = false;
+  nextCost = 1000;
+  cheats = false;
+  comms = false;
+  autoclicker = false;
+  rustUp = false;
+  rustRounds = 0;
+  rust = 0;
+  rustyPoints = 0;
+  loadingtextblk = false;
+  localStorage.setItem('ach1000', 'false');
+  localStorage.setItem('ach10000', 'false');
+  localStorage.setItem('ach20000', 'false');
+  document.getElementById('ach1000-box').classList.remove('unlocked');
+  document.getElementById('ach10000-box').classList.remove('unlocked');
+  document.getElementById('ach20000-box').classList.remove('unlocked');
+  document.getElementById('ach50000-box').classList.remove('unlocked');
+  console.log("All points and seeds have been reset.");
+}
+
+</script>
+</body>
+</html>
