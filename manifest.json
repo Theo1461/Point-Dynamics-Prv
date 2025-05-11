@@ -1,13 +1,13 @@
 {
   "name": "Point Dynamics(a)",
-  "short_name": "(a)",
+  "short_name": "Point(a)",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#FDFAF4",
   "theme_color": "#FDFAF4",
   "icons": [
     {
-      "src": "R.png",
+      "src": "dot.jpg",
       "sizes": "192x192",
       "type": "image/png"
     }
